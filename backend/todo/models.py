@@ -6,5 +6,5 @@ class Todo(models.Model):
     completed = models.BooleanField(default=False)
 
     def _str_(self):
-        return self.title
+        return f"Todo: {self.title}"
 
