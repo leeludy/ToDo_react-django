@@ -1,29 +1,18 @@
-import { useEffect, useState } from 'react';
+import FormTodo from './Tasks/FormAddTask';
+import ListTasks from './Tasks/ListTasks';
 
 function App() {
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    async function fetchdata() {
-      /* console.log(import.meta.env.VITE_API_URL); */
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}todo/`);
-        if (!response.ok) {
-          throw new Error('Network response had problem');
-        }
-        const result = await response.json();
-        console.log('result', result);
-        setData(result);
-      } catch (error) {
-        console.error('Erroe fetching data', error);
-      }
-    }
-    fetchdata();
-  }, []);
-
   return (
     <>
-      <h3>Hello</h3>
+      <div className="h-screen w-screen p-4 bg-stone-100">
+        <h1>ToDo</h1>
+        <section className="bg-white max-w-[500px] w-full m-auto rounded-md shadow-xl p-4 mb-8">
+          <FormTodo />
+        </section>
+        <section className="bg-white max-w-[500px] w-full m-auto rounded-md shadow-xl p-4">
+          <ListTasks />
+        </section>
+      </div>
     </>
   );
 }
