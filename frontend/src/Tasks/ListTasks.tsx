@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import Task from './Task';
+import { getTodos } from './Tasks.services';
 
 export default function ListTasks() {
   const {
@@ -8,9 +9,8 @@ export default function ListTasks() {
     error,
   } = useQuery({
     queryKey: ['todos'],
-    queryFn: () => getTodos,
+    queryFn: getTodos,
   });
-  console.log('data query todos', tasks);
 
   if (isLoading) {
     return <h2>Loading...</h2>;

@@ -1,18 +1,34 @@
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Pencil1Icon } from '@radix-ui/react-icons';
+import { updateTodo } from './Tasks.services';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface IFormInput {
+  id: string | number;
   title: string;
-  /* detail: string; */
-  /* done: boolean; */
+  /* description: string; */
+  /* completed: boolean; */
 }
 
 export default function FormModifyTask(props) {
-  const form = useForm({
-    defaultValues: { title: props.task.title },
+  const queryClient = useQueryClient();
+
+  const { error, mutate } = useMutation({
+    mutationFn: updateTodo,
+    onSuccess: (updatedTask) => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+      console.log(updatedTask);
+    },
+    onError() {
+      console.log('Mutation error: ', JSON.stringify(error));
+    },
   });
 
-  const onSubmit: SubmitHandler<IFormInput> = (data) => console.log(data);
+  const form = useForm({
+    defaultValues: { id: props.task.id, title: props.task.title },
+  });
+
+  const onSubmit: SubmitHandler<IFormInput> = (data) => mutate(data);
 
   return (
     <FormProvider {...form}>
