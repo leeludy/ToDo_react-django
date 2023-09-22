@@ -23,14 +23,16 @@ async function postTodo({ title, completed }: { title: string; completed: boolea
 
 async function updateTodo({
   id,
+  completed,
   title,
 }: /* description, */
 {
   id: string | number;
+  completed: boolean;
   title: string;
   /* description?: string; */
 }) {
-  return axios.put<ITodo>(`${ApiUrl}${id}/`, { title }).then((res) => console.log(res));
+  return axios.put<ITodo>(`${ApiUrl}${id}/`, { completed, title }).then((res) => res.data);
 }
 
 async function deleteTodo(id: string | number) {

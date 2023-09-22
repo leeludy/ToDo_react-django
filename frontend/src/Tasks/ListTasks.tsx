@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import Task from './Task';
+import CardTask from './CardTask';
 import { getTodos } from './Tasks.services';
 
 export default function ListTasks() {
@@ -20,8 +20,8 @@ export default function ListTasks() {
   }
   return (
     <div className="flex flex-col justify-between bg-stone-100 p-4 rounded-lg">
-      {tasks?.map((task, index) => (
-        <Task
+      {tasks?.map((task) => (
+        <CardTask
           key={task.id}
           {...task}
           /*   onRename={(newName) => renameTask(index, newName)}
