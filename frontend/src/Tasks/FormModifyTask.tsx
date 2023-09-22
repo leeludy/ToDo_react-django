@@ -5,9 +5,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface IFormInput {
   id: string | number;
+  completed: boolean;
   title: string;
   /* description: string; */
-  /* completed: boolean; */
 }
 
 export default function FormModifyTask(props) {
@@ -25,7 +25,7 @@ export default function FormModifyTask(props) {
   });
 
   const form = useForm({
-    defaultValues: { id: props.task.id, title: props.task.title },
+    defaultValues: { id: props.task.id, completed: props.task.completed, title: props.task.title },
   });
 
   const onSubmit: SubmitHandler<IFormInput> = (data) => mutate(data);
@@ -36,6 +36,7 @@ export default function FormModifyTask(props) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-raw justify-between bg-stone-100 p-4 rounded-lg"
       >
+        <input {...form.register('completed')} type="hidden" />
         <input
           {...form.register('title', {
             required: 'Please enter a task title.',
