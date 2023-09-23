@@ -1,41 +1,14 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusCircledIcon } from '@radix-ui/react-icons'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { queryOptionsGetTodos } from './Todo/Todo.queries'
-import { type Todo as EntityTodo, todoSchema } from './Todo/Todo.schemas'
+import { useFieldArray } from 'react-hook-form'
 import Todo from './Todo/Todo'
-import { useEffect } from 'react'
-import { ITodo } from './Todo/Todo.api'
-
-const formSchema = z.object({
-  todos: z.array(todoSchema),
-  entry: z.string().optional(),
-})
-
-type TodoForm = z.infer<typeof formSchema>
-
-function findChanges(previousTodos: ITodo[], newTodos: EntityTodo[]) {
-  return {
-    newTodos: newTodos.filter((todo) => !todo.id),
-    updatedTodos: newTodos.filter((v) =>
-      previousTodos.some(({ id, completed, title }) => id === v.id && (completed !== v.completed || title !== v.title))
-    ),
-    removedTodos: previousTodos.filter((v) => newTodos.every(({ id }) => v.id !== id)),
-  }
-}
+import { TodoForm, useDelayedSavedChanges, useFormTodo } from './Todo/Todo.form'
+import { queryOptionsGetTodos } from './Todo/Todo.queries'
 
 export function App() {
   const queryClient = useQueryClient()
   const { data: todos } = useQuery({ ...queryOptionsGetTodos() })
-  const { control, register, watch, resetField } = useForm<TodoForm>({
-    resolver: zodResolver(formSchema),
-    defaultValues: () =>
-      queryClient.fetchQuery(queryOptionsGetTodos()).then((todos) => ({
-        todos,
-      })),
-  })
+  const { control, register, watch, resetField, reset } = useFormTodo(queryClient)
 
   const { fields, append, remove, update } = useFieldArray<TodoForm, 'todos', 'key'>({
     name: 'todos',
@@ -44,21 +17,7 @@ export function App() {
   })
 
   const entry = watch('entry')
-
-  useEffect(() => {
-    const subscription = watch(({ todos: newTodos }, { name }) => {
-      if (name !== 'todos') {
-        return
-      }
-      if (!todos || !newTodos) {
-        return
-      }
-
-      findChanges(todos, z.array(todoSchema).parse(newTodos))
-    })
-
-    return subscription.unsubscribe
-  }, [watch, todos])
+  useDelayedSavedChanges(watch, () => reset({ entry: '', todos }), todos)
 
   return (
     <form className="h-screen w-screen p-4 bg-stone-100">
@@ -86,7 +45,11 @@ export function App() {
       <section className="bg-white max-w-[500px] w-full m-auto rounded-md shadow-xl p-4">
         <div className="flex flex-col justify-between bg-stone-100 p-4 rounded-lg">
           {fields.map((todo, index) => (
-            <Todo {...todo} onDelete={() => remove(index)} onUpdate={(todo) => update(index, todo)} />
+            <Todo
+              {...todo}
+              onDelete={() => remove(index)}
+              onUpdate={(todo) => update(index, todo)}
+            />
           ))}
         </div>
       </section>

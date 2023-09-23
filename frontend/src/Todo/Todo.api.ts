@@ -21,20 +21,12 @@ async function postTodo({ title, completed }: { title: string; completed: boolea
   return axios.post<ITodo>(ApiUrl, { title, completed }).then((res) => res.data)
 }
 
-async function updateTodo({
-  id,
-  title,
-}: /* description, */
-{
-  id: string | number
-  title: string
-  /* description?: string; */
-}) {
-  return axios.put<ITodo>(`${ApiUrl}${id}/`, { title }).then((res) => console.log(res))
+async function updateTodo({ id, title, completed }: ITodo) {
+  return axios.put<ITodo>(`${ApiUrl}${id}/`, { title, completed })
 }
 
 async function deleteTodo(id: string | number) {
-  return axios.delete<ITodo>(`${ApiUrl}${id}/`).then(() => console.log('task deleted'))
+  return axios.delete<ITodo>(`${ApiUrl}${id}/`)
 }
 
 export { getTodos, getTodo, postTodo, updateTodo, deleteTodo }
