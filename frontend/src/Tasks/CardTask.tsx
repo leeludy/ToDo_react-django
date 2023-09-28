@@ -1,56 +1,41 @@
-import { TrashIcon } from '@radix-ui/react-icons';
-import { useState } from 'react';
-import { CheckBoxRdx } from '../elements/Checkbox';
-import { deleteTodo, updateTodo } from './Tasks.services';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
-import FormModifyTask from './FormModifyTask';
+import { TrashIcon } from '@radix-ui/react-icons'
+import { useState } from 'react'
+import { CheckBoxRdx } from '../elements/Checkbox'
+import { Todo, deleteTodo, updateTodo } from './Tasks.services'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
+import FormModifyTask from './FormModifyTask'
 
-export interface ITask {
-  id: string | number;
-  title: string;
-  completed: boolean;
-}
-
-// type FormInput = {
-//   id: string | number;
-//   title: string;
-//   completed: boolean;
-//   /* description: string; */
-// };
-
-export default function CardTask(task: ITask) {
-  const queryClient = useQueryClient();
+export default function CardTask(task: Todo) {
+  const queryClient = useQueryClient()
 
   const mutationUpdate = useMutation({
     mutationFn: updateTodo,
     onSuccess: (updatedTask) => {
-      queryClient.invalidateQueries({ queryKey: ['todos'] });
-      console.log(updatedTask);
+      queryClient.invalidateQueries({ queryKey: ['todos'] })
+      console.log(updatedTask)
     },
     onError() {
-      console.log('Mutation error: ', JSON.stringify(mutationUpdate.error));
+      console.log('Mutation error: ', JSON.stringify(mutationUpdate.error))
     },
-  });
+  })
 
   const mutationDelete = useMutation({
     mutationFn: deleteTodo,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todos'] });
+      queryClient.invalidateQueries({ queryKey: ['todos'] })
     },
     onError() {
-      console.log('Mutation error: ', JSON.stringify(mutationDelete.error));
+      console.log('Mutation error: ', JSON.stringify(mutationDelete.error))
     },
-  });
+  })
 
   const form = useForm({
     defaultValues: { id: task.id, completed: task.completed, title: task.title },
     mode: 'onChange',
-  });
+  })
 
-  // const onSubmit: SubmitHandler<FormInput> = (data) => mutationUpdate.mutate(data);
-
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(false)
 
   return (
     <div
@@ -70,8 +55,9 @@ export default function CardTask(task: ITask) {
                   id={`${task.id}`}
                   checked={field.value}
                   onCheckedChange={(v) => {
-                    field.onChange(v);
-                    console.log(field.name, 'value', v);
+                    field.onChange(v)
+                    const data = form.getValues()
+                    mutationUpdate.mutate(data)
                   }}
                 />
               )}
@@ -89,5 +75,5 @@ export default function CardTask(task: ITask) {
         <TrashIcon className="h-5 w-5 my-2 mx-2 " />
       </button>
     </div>
-  );
+  )
 }
